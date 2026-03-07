@@ -1,6 +1,45 @@
 import streamlit as st
 import pandas as pd
 
+# ==========================================
+# 🔐 ログイン機能の追加
+# ==========================================
+# 好きなパスワードに書き換えてください
+MY_PASSWORD = "password123"
+
+def check_password():
+    """パスワードが正しいか判定する関数"""
+    # まだログイン状態が保存されていなければ False にする
+    if "logged_in" not in st.session_state:
+        st.session_state.logged_in = False
+
+    # ログインしていない場合の画面
+    if not st.session_state.logged_in:
+        st.title("🔒 ログイン")
+        password_input = st.text_input("パスワードを入力してください", type="0126")
+        
+        if st.button("ログイン"):
+            if password_input == MY_PASSWORD:
+                st.session_state.logged_in = True
+                st.rerun() # 画面をリロードしてメインアプリを表示
+            else:
+                st.error("パスワードが違います！")
+        return False
+    
+    # ログイン済みの場合は True を返す
+    return True
+
+# ==========================================
+# 🚀 ここから下がメインのアプリ
+# ==========================================
+
+# もしログインに成功していたら、今までのアプリを表示する
+if check_password():
+    
+    # --- データの初期化（無料でセッションに保存） ---
+    if 'weekly_goal' not in st.session_state:
+        st.session_state.weekly_goal = ""
+
 # ページ設定
 st.set_page_config(page_title="1週間の計画アプリ", layout="wide")
 
@@ -192,4 +231,5 @@ def make_gcal_url(task_name):
 # Streamlitでの表示例
 task_name = "プログラミングの勉強"
 url = make_gcal_url(task_name)
+
 st.markdown(f"[📅 カレンダーに『{task_name}』を追加する]({url})")
