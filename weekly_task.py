@@ -8,7 +8,6 @@ st.set_page_config(page_title="1週間の計画アプリ", layout="wide")
 # ==========================================
 # 🔐 ログイン機能
 # ==========================================
-# パスワードを「0126」に設定しました
 
 
 def check_password():
@@ -206,6 +205,7 @@ if check_password():
                 for w in day_wants:
                     url = make_gcal_url(w['name'])
                     st.markdown(f"🔵 {w['name']} \n [📅 カレンダーへ]({url})")
+
 
 
 
