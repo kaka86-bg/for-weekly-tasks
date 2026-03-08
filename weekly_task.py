@@ -19,7 +19,7 @@ def check_password():
     if not st.session_state.logged_in:
         st.title("🔒 ログイン")
         # type="password" にすると入力した文字が黒丸(●●●)で隠れます
-        password_input = st.text_input("パスワードを入力してください", type="password")
+        password_input = st.text_input("パスワードを入力してください", type="0126")
         
         if st.button("ログイン"):
             if password_input == MY_PASSWORD:
@@ -146,4 +146,63 @@ if check_password():
                 })
                 st.rerun()
 
-        st.subheader("現在のやり
+        st.subheader("現在のやりたいこと一覧")
+        for w in st.session_state.wants:
+            st.write(f"・ {w['name']}")
+
+    # --- ステップ5: 全体の整理・確認 ---
+    elif step == "5. 全体の整理・確認":
+        st.title("📊 ステップ5: タスクとやりたいことの全体像")
+        
+        all_items = []
+        for t in st.session_state.tasks:
+            all_items.append({"種類": "🔴 Have to", "内容": t["name"], "目標優先度": t["goal_priority"], "絶対優先度": t["general_priority"]})
+        for w in st.session_state.wants:
+            all_items.append({"種類": "🔵 Want to", "内容": w["name"], "目標優先度": "-", "絶対優先度": "-"})
+        
+        if all_items:
+            df = pd.DataFrame(all_items)
+            st.dataframe(df, use_container_width=True)
+        else:
+            st.write("まだアイテムがありません。")
+
+    # --- ステップ6: 1週間のスケジュールに割り当てる ---
+    elif step == "6. 1週間のスケジュールに割り当てる":
+        st.title("📅 ステップ6: 1週間に割り当てる")
+        days_of_week = ["未定", "月", "火", "水", "木", "金", "土", "日"]
+        
+        st.subheader("🔴 Have to (タスク)")
+        for i, task in enumerate(st.session_state.tasks):
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.write(f"**{task['name']}**")
+            with col2:
+                st.session_state.tasks[i]["day"] = st.selectbox("曜日", days_of_week, key=f"task_day_{i}", index=days_of_week.index(task.get("day", "未定")))
+                
+        st.subheader("🔵 Want to (やりたい事)")
+        for i, want in enumerate(st.session_state.wants):
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.write(f"**{want['name']}**")
+            with col2:
+                st.session_state.wants[i]["day"] = st.selectbox("曜日", days_of_week, key=f"want_day_{i}", index=days_of_week.index(want.get("day", "未定")))
+
+        st.divider()
+        st.title("🎉 今週の完成スケジュール")
+        
+        columns = st.columns(7)
+        for idx, day in enumerate(days_of_week[1:]): 
+            with columns[idx]:
+                st.markdown(f"### {day}")
+                
+                # タスクを表示し、横にGoogleカレンダー追加リンクを設置
+                day_tasks = [t for t in st.session_state.tasks if t["day"] == day]
+                for t in day_tasks:
+                    url = make_gcal_url(t['name'])
+                    st.markdown(f"🔴 {t['name']} \n [📅 カレンダーへ]({url})")
+                
+                # やりたいことを表示し、横にGoogleカレンダー追加リンクを設置
+                day_wants = [w for w in st.session_state.wants if w["day"] == day]
+                for w in day_wants:
+                    url = make_gcal_url(w['name'])
+                    st.markdown(f"🔵 {w['name']} \n [📅 カレンダーへ]({url})")
