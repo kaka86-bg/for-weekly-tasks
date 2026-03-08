@@ -19,7 +19,7 @@ def check_password():
     if not st.session_state.logged_in:
         st.title("🔒 ログイン")
         # type="password" にすると入力した文字が黒丸(●●●)で隠れます
-        password_input = st.text_input("パスワードを入力してください", type="0126")
+        password_input = st.text_input("0126", type="password")
         
         if st.button("ログイン"):
             if password_input == MY_PASSWORD:
@@ -206,3 +206,4 @@ if check_password():
                 for w in day_wants:
                     url = make_gcal_url(w['name'])
                     st.markdown(f"🔵 {w['name']} \n [📅 カレンダーへ]({url})")
+
