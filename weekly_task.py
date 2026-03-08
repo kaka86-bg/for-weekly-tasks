@@ -9,7 +9,7 @@ st.set_page_config(page_title="1週間の計画アプリ", layout="wide")
 # 🔐 ログイン機能
 # ==========================================
 # パスワードを「0126」に設定しました
-MY_PASSWORD = "0126"
+
 
 def check_password():
     """パスワードが正しいか判定する関数"""
@@ -18,11 +18,11 @@ def check_password():
 
     if not st.session_state.logged_in:
         st.title("🔒 ログイン")
-        # type="password" にすると入力した文字が黒丸(●●●)で隠れます
         password_input = st.text_input("パスワードを入力してください。", type="password")
         
         if st.button("ログイン"):
-            if password_input == MY_PASSWORD:
+            # 🌟 ここを変更！ st.secrets からパスワードを読み込みます
+            if password_input == st.secrets["app_password"]:
                 st.session_state.logged_in = True
                 st.rerun() 
             else:
@@ -206,5 +206,6 @@ if check_password():
                 for w in day_wants:
                     url = make_gcal_url(w['name'])
                     st.markdown(f"🔵 {w['name']} \n [📅 カレンダーへ]({url})")
+
 
 
